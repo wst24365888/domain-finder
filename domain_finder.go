@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"runtime"
+	"strconv"
 	"time"
 )
 
@@ -23,6 +25,8 @@ func dispatcher(jobChan chan Domain, closed chan bool) {
 
 	defer close(jobChan)
 
+	var counter int = 0
+
 	for _, firstLetter := range ALPHABETS {
 		for _, secondLetter := range ALPHABETS {
 			for _, thirdLetter := range ALPHABETS {
@@ -32,6 +36,13 @@ func dispatcher(jobChan chan Domain, closed chan bool) {
 
 					if match {
 						jobChan <- Domain{domain, false}
+
+						counter++
+
+						if counter%100 == 0 {
+							fmt.Print("\033[H\033[2J")
+							fmt.Println("dispatched: " + strconv.Itoa(counter) + " jobs")
+						}
 					}
 				}
 			}
@@ -96,8 +107,8 @@ func consumer(respChan chan Domain, closed chan bool) {
 }
 
 func main() {
-	const WORKER_AMOUNT int = 25
-	const BUFFER_SIZE int = 100
+	const WORKER_AMOUNT int = 100
+	const BUFFER_SIZE int = WORKER_AMOUNT
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	jobChan := make(chan Domain, BUFFER_SIZE)
