@@ -21,7 +21,8 @@ func dispatcher(jobChan chan Domain, closed chan bool) {
 	const TLD string = ".com"
 
 	// Go doesn't support const arrays (or slices)
-	ALPHABETS := []string{"-", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+	// ALPHABETS := []string{"-", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+	ALPHABETS := []string{"-", "y", "2", "x"}
 
 	defer close(jobChan)
 
@@ -94,10 +95,11 @@ func consumer(respChan chan Domain, closed chan bool) {
 		log.Fatal(err)
 	}
 
+CONSUMER_LOOP:
 	for {
 		select {
 		case <-closed:
-			break
+			break CONSUMER_LOOP
 		case d := <-respChan:
 			if d.available {
 				f.WriteString(d.name + "\n")
